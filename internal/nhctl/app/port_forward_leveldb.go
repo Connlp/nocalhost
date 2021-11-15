@@ -31,7 +31,7 @@ func (a *Application) CheckIfPortForwardExists(svcName string, localPort, remote
 	return false, nil
 }
 
-// You should `CheckIfPortForwardExists` before adding a port-forward to db
+// AddPortForwardToDB You should `CheckIfPortForwardExists` before adding a port-forward to db
 func (a *Application) AddPortForwardToDB(svcName string, port *profile.DevPortForward) error {
 
 	profileV2, err := profile.NewAppProfileV2ForUpdate(a.NameSpace, a.Name)

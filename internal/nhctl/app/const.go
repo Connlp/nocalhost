@@ -32,7 +32,7 @@ const (
 	DefaultConfigFilePermission        = 0644
 	DefaultClientGoTimeOut             = time.Minute * 5
 
-	// nhctl init
+	// DefaultInitHelmGitRepo nhctl init
 	// TODO when release
 	DefaultInitHelmGitRepo             = "https://github.com/nocalhost/nocalhost.git"
 	DefaultInitHelmCODINGGitRepo       = "https://e.coding.net/codingcorp/nocalhost/nocalhost.git"
@@ -50,7 +50,7 @@ const (
 	DefaultInitWaitNameSpace           = "nocalhost-reserved"
 	DefaultInitCreateNameSpaceLabels   = "nocalhost-init"
 	DefaultInitWaitDeployment          = "nocalhost-dep"
-	// TODO when release
+	// DefaultInitHelmResourcePath TODO when release
 	DefaultInitHelmResourcePath   = "deployments/chart"
 	DefaultInitPortForwardTimeOut = time.Minute * 1
 	DefaultInitApplicationGithub  = "{\"source\":\"git\",\"install_type\":\"rawManifest\"," +
@@ -68,18 +68,18 @@ const (
 		"\"rawManifest\",\"resource_dir\":[\"manifest/templates\"],\"application_name\"" +
 		":\"bookinfo\",\"application_url\":" +
 		"\"https://e.coding.net/codingcorp/nocalhost/bookinfo.git\"}"
-	// Init Component Version Control, HEAD means build from tag
+	// DefaultNocalhostMainBranch Init Component Version Control, HEAD means build from tag
 	DefaultNocalhostMainBranch        = "HEAD"
 	DefaultNocalhostDepDockerRegistry = "codingcorp-docker.pkg.coding.net/nocalhost/public/nocalhost-dep"
 
-	// file sync
+	// DefaultNocalhostSideCarName file sync
 	DefaultNocalhostSideCarName = "nocalhost-sidecar"
 
 	DefaultDevContainerShell = "(zsh || bash || sh)"
 
 	DependenceConfigMapPrefix = "nocalhost-depends-do-not-overwrite"
 
-	// Port-forward
+	// PortForwardManual Port-forward
 	PortForwardManual   = "manual"
 	PortForwardDevPorts = "devPorts"
 )

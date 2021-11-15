@@ -17,7 +17,7 @@ import (
 	"nocalhost/pkg/nhctl/utils"
 )
 
-// Used by dep
+// InstallEnvForDep Used by dep
 type InstallEnvForDep struct {
 	Global  []*profile.Env      `json:"global" yaml:"global"`
 	Service []*ServiceEnvForDep `json:"service" yaml:"service"`

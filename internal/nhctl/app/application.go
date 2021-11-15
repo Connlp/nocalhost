@@ -43,7 +43,7 @@ import (
 
 const (
 
-	// default is a special app type, it can be uninstalled neither installed
+	// DefaultNocalhostApplication default is a special app type, it can be uninstalled neither installed
 	// it's a virtual application to managed that those manifest out of Nocalhost management
 	DefaultNocalhostApplication           = "default.application"
 	DefaultNocalhostApplicationOperateErr = "default.application is a virtual application " +
@@ -51,8 +51,8 @@ const (
 		" management so can't be install, uninstall, reset, etc."
 
 	HelmReleaseName               = "meta.helm.sh/release-name"
-	AppManagedByLabel             = "app.kubernetes.io/managed-by"
-	AppManagedByNocalhost         = "nocalhost"
+	ManagedByLabel                = "app.kubernetes.io/managed-by"
+	ManagedByNocalhost            = "nocalhost"
 	NocalhostApplicationName      = "dev.nocalhost/application-name"
 	NocalhostApplicationNamespace = "dev.nocalhost/application-namespace"
 )
@@ -103,7 +103,7 @@ func (a *Application) moveProfileFromFileToLeveldb() error {
 	return nocalhost.UpdateProfileV2(a.NameSpace, a.Name, profileV2)
 }
 
-// When new a application, kubeconfig is required to get meta in k8s cluster
+// NewApplication When new a application, kubeconfig is required to get meta in k8s cluster
 // KubeConfig can be acquired from profile in leveldb
 func NewApplication(name string, ns string, kubeconfig string, initClient bool) (*Application, error) {
 
@@ -124,7 +124,7 @@ func NewApplication(name string, ns string, kubeconfig string, initClient bool) 
 	// 4. update kubeconfig for profile
 	// 5. init go client inner Application
 
-	if err := app.tryLoadProfileFromLocal(); err != nil {
+	if err = app.tryLoadProfileFromLocal(); err != nil {
 		return nil, err
 	}
 
@@ -132,7 +132,7 @@ func NewApplication(name string, ns string, kubeconfig string, initClient bool) 
 	// should make a fake installation and generate an application meta
 	if app.generateSecretForEarlierVer() {
 
-		// load app meta if generate secret for earlier verion
+		// load app meta if generate secret for earlier version
 		if app.appMeta, err = nocalhost.GetApplicationMeta(app.Name, app.NameSpace, app.KubeConfig); err != nil {
 			return nil, err
 		}
@@ -196,8 +196,8 @@ func (a *Application) generateSecretForEarlierVer() bool {
 			//a.profileV2.Secreted = true
 			p, _ := profile.NewAppProfileV2ForUpdate(a.NameSpace, a.Name)
 			p.Secreted = true
-			p.Save()
-			p.CloseDb()
+			_ = p.Save()
+			_ = p.CloseDb()
 			//_ = nocalhost.UpdateProfileV2(a.NameSpace, a.Name, a.profileV2)
 		}()
 
@@ -315,7 +315,7 @@ func (a *Application) GetProfile() (*profile.AppProfileV2, error) {
 	return nocalhost.GetProfileV2(a.NameSpace, a.Name)
 }
 
-// You need to closeDB for profile explicitly
+// GetProfileForUpdate You need to closeDB for profile explicitly
 func (a *Application) GetProfileForUpdate() (*profile.AppProfileV2, error) {
 	return profile.NewAppProfileV2ForUpdate(a.NameSpace, a.Name)
 }
@@ -390,7 +390,7 @@ func (a *Application) SaveSvcProfileV2(svcName string, config *profile.ServiceCo
 	if err != nil {
 		return err
 	}
-	defer profileV2.CloseDb()
+	defer func() { _ = profileV2.CloseDb() }()
 
 	svcPro := profileV2.FetchSvcProfileV2FromProfile(svcName)
 	if svcPro != nil {
@@ -425,7 +425,7 @@ func (a *Application) SaveAppProfileV2(config *profile.ApplicationConfig) error 
 	if err != nil {
 		return err
 	}
-	defer profileV2.CloseDb()
+	defer func() { _ = profileV2.CloseDb() }()
 
 	//a.AppProfileV2.ResourcePath = config.ResourcePath
 	//a.AppProfileV2.IgnoredPath = config.IgnoredPath
@@ -512,7 +512,7 @@ func (a *Application) RollBack(svcName string, reset bool) error {
 	if dep.Labels == nil {
 		dep.Labels = make(map[string]string, 0)
 	}
-	dep.Labels[AppManagedByLabel] = AppManagedByNocalhost
+	dep.Labels[ManagedByLabel] = ManagedByNocalhost
 
 	if dep.Annotations == nil {
 		dep.Annotations = make(map[string]string, 0)
@@ -655,11 +655,11 @@ func (a *Application) GetDescription() string {
 func (a *Application) GetSvcDescription(svcName string) string {
 	appProfile, _ := a.GetProfile()
 	desc := ""
-	profile := appProfile.FetchSvcProfileV2FromProfile(svcName)
-	if profile != nil {
-		profile.Developing = a.appMeta.CheckIfDeploymentDeveloping(svcName)
-		profile.Possess = a.appMeta.DeploymentDevModePossessor(svcName, appProfile.Identifier)
-		bytes, err := yaml.Marshal(profile)
+	profileV2 := appProfile.FetchSvcProfileV2FromProfile(svcName)
+	if profileV2 != nil {
+		profileV2.Developing = a.appMeta.CheckIfDeploymentDeveloping(svcName)
+		profileV2.Possess = a.appMeta.DeploymentDevModePossessor(svcName, appProfile.Identifier)
+		bytes, err := yaml.Marshal(profileV2)
 		if err == nil {
 			desc = string(bytes)
 		}
@@ -678,7 +678,7 @@ func (a *Application) ListContainersByDeployment(depName string) ([]corev1.Conta
 	return pods.Items[0].Spec.Containers, nil
 }
 
-// Role: If set to "SYNC", means it is a pf used for syncthing
+// PortForward Role: If set to "SYNC", means it is a pf used for syncthing
 func (a *Application) PortForward(deployment, podName string, localPort, remotePort int, role string) error {
 
 	//if isAvailable := ports.IsTCP4PortAvailable("0.0.0.0", localPort); isAvailable {
@@ -874,7 +874,7 @@ func (a *Application) PortForwardAPod(req clientgoutils.PortForwardAPodRequest) 
 	return a.client.PortForwardAPod(req)
 }
 
-// set pid file empty
+// SetPidFileEmpty set pid file empty
 func (a *Application) SetPidFileEmpty(filePath string) error {
 	return os.Remove(filePath)
 }

@@ -82,7 +82,7 @@ func (a *Application) GetPortForwardForSync(svcName string) (*profile.DevPortFor
 	return nil, nil
 }
 
-// If not found return err
+// GetPortForward If not found return err
 func (a *Application) GetPortForward(svcName string, localPort, remotePort int) (*profile.DevPortForward, error) {
 	var err error
 	svcProfile, err := a.GetSvcProfile(svcName)
@@ -114,7 +114,7 @@ func (a *Application) EndDevPortForward(svcName string, localPort int, remotePor
 	for index, portForward := range svcProfile.DevPortForwardList {
 		if portForward.LocalPort == localPort && portForward.RemotePort == remotePort {
 			if portForward.RunByDaemonServer {
-				profileV2.CloseDb() // Daemon Server will update it
+				_ = profileV2.CloseDb() // Daemon Server will update it
 				//isAdmin := utils.IsSudoUser()
 				client, err := daemon_client.NewDaemonClient(portForward.Sudo)
 				if err != nil {
@@ -130,7 +130,7 @@ func (a *Application) EndDevPortForward(svcName string, localPort int, remotePor
 				)
 			} else {
 				log.Infof("Kill %v", *portForward)
-				err := terminate.Terminate(portForward.Pid, true, "port-forward")
+				err = terminate.Terminate(portForward.Pid, true, "port-forward")
 				if err != nil {
 					return errors.Wrap(err, "")
 				}

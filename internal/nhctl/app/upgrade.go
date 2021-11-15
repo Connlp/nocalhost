@@ -49,7 +49,7 @@ func (a *Application) PrepareForUpgrade(flags *flag.InstallFlags) error {
 	}
 
 	a.appMeta.Config = config
-	if err := a.appMeta.Update(); err != nil {
+	if err = a.appMeta.Update(); err != nil {
 		return err
 	}
 

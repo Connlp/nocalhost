@@ -287,7 +287,7 @@ func (d *DaemonClient) sendAndWaitForResponse(data []byte) ([]byte, error) {
 	if !ok {
 		return nil, errors.Wrap(err, "Error to close write to daemon server ")
 	}
-	cw.CloseWrite()
+	_ = cw.CloseWrite()
 
 	return ioutil.ReadAll(conn)
 }

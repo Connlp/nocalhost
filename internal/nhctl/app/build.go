@@ -108,7 +108,7 @@ func BuildApplication(name string, flags *app_flags.InstallFlags, kubeconfig str
 
 	appMeta.Config = config
 	appMeta.ApplicationType = appmeta.AppType(flags.AppType)
-	if err := appMeta.Update(); err != nil {
+	if err = appMeta.Update(); err != nil {
 		return nil, err
 	}
 
@@ -134,7 +134,7 @@ func (a *Application) loadOrGenerateConfig(outerConfig, config string, resourceP
 	configFilePath := outerConfig
 	// Read from .nocalhost
 	if configFilePath == "" {
-		if _, err := os.Stat(a.getConfigPathInGitResourcesDir(config)); err != nil {
+		if _, err = os.Stat(a.getConfigPathInGitResourcesDir(config)); err != nil {
 			if !os.IsNotExist(err) {
 				return nil, errors.Wrap(err, "")
 			}

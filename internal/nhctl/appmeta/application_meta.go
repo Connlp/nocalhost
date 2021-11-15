@@ -57,7 +57,7 @@ const (
 	DependenceConfigMapPrefix = "nocalhost-depends-do-not-overwrite"
 )
 
-// resolve Application name by k8s 'metadata.name'
+// GetApplicationName resolve Application name by k8s 'metadata.name'
 func GetApplicationName(secretName string) (string, error) {
 	if idx := strings.Index(secretName, "/"); idx > 0 {
 		if len(secretName) > idx+1 {
@@ -111,7 +111,7 @@ func ApplicationStateOf(s string) ApplicationState {
 type ApplicationMetas []*ApplicationMeta
 type ApplicationMetaSimples []*ApplicationMetaSimple
 
-// describe the applications meta for output
+// Desc describe the applications meta for output
 func (as ApplicationMetas) Desc() (result ApplicationMetaSimples) {
 	for _, meta := range as {
 		result = append(
@@ -194,26 +194,26 @@ func Decode(secret *corev1.Secret) (*ApplicationMeta, error) {
 		ApplicationState: ApplicationStateOf(string(bs)),
 	}
 
-	if bs, ok := secret.Data[SecretPreInstallKey]; ok {
+	if bs, ok = secret.Data[SecretPreInstallKey]; ok {
 		appMeta.PreInstallManifest = string(decompress(bs))
 	}
 
-	if bs, ok := secret.Data[SecretManifestKey]; ok {
+	if bs, ok = secret.Data[SecretManifestKey]; ok {
 		appMeta.Manifest = string(decompress(bs))
 	}
 
-	if bs, ok := secret.Data[SecretAppTypeKey]; ok {
+	if bs, ok = secret.Data[SecretAppTypeKey]; ok {
 		appMeta.ApplicationType = AppType(bs)
 	}
 
-	if bs, ok := secret.Data[SecretDevMetaKey]; ok {
+	if bs, ok = secret.Data[SecretDevMetaKey]; ok {
 		devMeta := &ApplicationDevMeta{}
 
 		_ = yaml.Unmarshal(bs, devMeta)
 		appMeta.DevMeta = *devMeta
 	}
 
-	if bs, ok := secret.Data[SecretConfigKey]; ok {
+	if bs, ok = secret.Data[SecretConfigKey]; ok {
 		config, _ := unmarshalConfigUnStrict(decompress(bs))
 		appMeta.Config = config
 	}

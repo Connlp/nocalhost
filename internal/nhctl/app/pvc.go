@@ -28,7 +28,7 @@ func (a *Application) GetPVCsBySvc(svcName string) ([]v1.PersistentVolumeClaim, 
 	return a.client.GetPvcByLabels(map[string]string{AppLabel: a.Name, ServiceLabel: svcName})
 }
 
-// If svcName specified, cleaning pvcs created by the service
+// CleanUpPVCs If svcName specified, cleaning pvcs created by the service
 // If svcName not specified, cleaning all pvcs created by the application
 func (a *Application) CleanUpPVCs(svcName string, continueOnErr bool) error {
 	var (
